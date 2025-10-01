@@ -353,6 +353,39 @@ function App() {
     const revendedoraArray = Object.values(byRevendedora).sort((a, b) => b.valorTotal - a.valorTotal);
     const produtoArray = Object.values(byProduto).sort((a, b) => b.valorTotal - a.valorTotal);
 
+    // Get top products for each top revendedora
+    const topRevendedorasWithProducts = revendedoraArray.slice(0, 20).map(revendedora => {
+      // Filter sales data for this revendedora
+      const revendedoraSales = salesData.filter(item => item.revendedora === revendedora.revendedora);
+
+      // Group by product
+      const productsByRevendedora = revendedoraSales.reduce((acc, item) => {
+        if (!acc[item.produto]) {
+          acc[item.produto] = {
+            produto: item.produto,
+            nomeProduto: item.nomeProduto,
+            codigoProduto: item.codigoProduto,
+            valorTotal: 0,
+            quantidadeItens: 0,
+            transacoes: 0
+          };
+        }
+        acc[item.produto].valorTotal += item.valorTotal;
+        acc[item.produto].quantidadeItens += item.quantidadeItens;
+        acc[item.produto].transacoes += 1;
+        return acc;
+      }, {});
+
+      const topProducts = Object.values(productsByRevendedora)
+        .sort((a, b) => b.quantidadeItens - a.quantidadeItens)
+        .slice(0, 5);
+
+      return {
+        ...revendedora,
+        topProducts
+      };
+    });
+
     return {
       totalValor: salesData.reduce((sum, item) => sum + item.valorTotal, 0),
       totalItens: salesData.reduce((sum, item) => sum + item.quantidadeItens, 0),
@@ -363,6 +396,7 @@ function App() {
       byTipo: tipoArray,
       byRevendedora: revendedoraArray,
       topRevendedoras: revendedoraArray.slice(0, 20),
+      topRevendedorasWithProducts,
       byProduto: produtoArray,
       topProdutos: produtoArray.slice(0, 20),
       allData: salesData,
@@ -828,6 +862,57 @@ function App() {
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+
+                {/* Top Products by Revendedora */}
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-8">
+                  <h3 className="text-xl font-semibold text-white mb-6">Produtos Mais Comprados por Revendedora</h3>
+                  <div className="grid gap-6">
+                    {salesAnalytics.topRevendedorasWithProducts.map((rev, idx) => (
+                      <div key={idx} className="bg-white/5 rounded-xl p-5 border border-white/10 hover:border-orange-500/50 transition-all">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                              {idx + 1}
+                            </div>
+                            <div>
+                              <h4 className="text-lg font-bold text-white">{rev.nome}</h4>
+                              <p className="text-sm text-gray-400">
+                                {rev.quantidade} transações • {rev.itens} itens • R$ {rev.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold text-gray-400 mb-3">Top 5 Produtos Mais Comprados:</p>
+                          {rev.topProducts.length > 0 ? (
+                            <div className="grid gap-2">
+                              {rev.topProducts.map((produto, pIdx) => (
+                                <div key={pIdx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-white font-bold text-xs">
+                                      {pIdx + 1}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-white font-medium truncate">{produto.nomeProduto}</p>
+                                      <p className="text-xs text-gray-400">{produto.transacoes} transação(ões)</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right flex-shrink-0 ml-4">
+                                    <p className="text-cyan-400 font-bold">{produto.quantidadeItens} itens</p>
+                                    <p className="text-xs text-green-400">R$ {produto.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-gray-400 text-sm italic">Nenhum produto encontrado</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
