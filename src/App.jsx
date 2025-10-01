@@ -970,8 +970,7 @@ function App() {
                   </button>
                 </div>
               </>
-            )
-          )}
+            )}
         </div>
 
         {/* Products/Buyers Analytics */}
