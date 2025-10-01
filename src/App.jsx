@@ -92,7 +92,7 @@ function App() {
         // QuantidadeItens
         const quantidadeItens = parseFloat(getColumnValue(['quantidadeitens', 'quantidade', 'qtd'])) || 0;
 
-        // ValorVenda
+        // ValorVenda (já é o valor total da transação, não unitário)
         const valorVenda = parseFloat(getColumnValue(['valorvenda', 'valordevenda', 'valor'])) || 0;
 
         return {
@@ -108,7 +108,7 @@ function App() {
           tipo,
           quantidadeItens,
           valorVenda,
-          valorTotal: quantidadeItens * valorVenda
+          valorTotal: valorVenda  // ValorVenda já é o total da transação
         };
       });
 
@@ -439,8 +439,7 @@ function App() {
       'Produto': item.produto,
       'Tipo': item.tipo,
       'Quantidade Itens': item.quantidadeItens,
-      'Valor Unitário': item.valorVenda.toFixed(2),
-      'Valor Total': item.valorTotal.toFixed(2)
+      'Valor Transação': item.valorVenda.toFixed(2)
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
@@ -915,9 +914,8 @@ function App() {
                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Revendedora</th>
                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Produto</th>
                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Tipo</th>
-                          <th className="text-right py-3 px-4 text-gray-400 font-medium">Qtd</th>
-                          <th className="text-right py-3 px-4 text-gray-400 font-medium">Valor Unit.</th>
-                          <th className="text-right py-3 px-4 text-gray-400 font-medium">Valor Total</th>
+                          <th className="text-right py-3 px-4 text-gray-400 font-medium">Qtd Itens</th>
+                          <th className="text-right py-3 px-4 text-gray-400 font-medium">Valor Transação</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -937,11 +935,8 @@ function App() {
                               </span>
                             </td>
                             <td className="py-3 px-4 text-right text-cyan-400">{item.quantidadeItens}</td>
-                            <td className="py-3 px-4 text-right text-gray-300">
-                              R$ {item.valorVenda.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                            </td>
                             <td className="py-3 px-4 text-right text-green-400 font-bold">
-                              R$ {item.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              R$ {item.valorVenda.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                             </td>
                           </tr>
                         ))}
