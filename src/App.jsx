@@ -20,23 +20,10 @@ function App() {
   const [salesFilterType, setSalesFilterType] = useState('all');
   const [salesFilterGerencia, setSalesFilterGerencia] = useState('all');
 
-  // Simplify Setor names
+  // Keep full Setor name
   const simplifySetor = (setor) => {
     if (!setor) return 'N/A';
-    const setorStr = String(setor).toLowerCase();
-
-    if (setorStr.includes('norte')) return 'Norte';
-    if (setorStr.includes('sul')) return 'Sul';
-    if (setorStr.includes('leste')) return 'Leste';
-    if (setorStr.includes('oeste')) return 'Oeste';
-    if (setorStr.includes('centro')) return 'Centro';
-    if (setorStr.includes('nordeste')) return 'Nordeste';
-    if (setorStr.includes('sudeste')) return 'Sudeste';
-    if (setorStr.includes('noroeste')) return 'Noroeste';
-    if (setorStr.includes('sudoeste')) return 'Sudoeste';
-
-    // Se for muito longo, pega as primeiras 15 caracteres
-    return String(setor).length > 15 ? String(setor).substring(0, 15) + '...' : String(setor);
+    return String(setor);
   };
 
   // Process Sales Excel file
@@ -313,7 +300,7 @@ function App() {
       return acc;
     }, {});
 
-    // Group by Tipo
+    // Group by Tipo (using quantity of items instead of value)
     const byTipo = salesData.reduce((acc, item) => {
       if (!acc[item.tipo]) {
         acc[item.tipo] = { tipo: item.tipo, valorTotal: 0, quantidade: 0, itens: 0 };
@@ -375,9 +362,9 @@ function App() {
       bySetor: setorArray,
       byTipo: tipoArray,
       byRevendedora: revendedoraArray,
-      topRevendedoras: revendedoraArray.slice(0, 10),
+      topRevendedoras: revendedoraArray.slice(0, 20),
       byProduto: produtoArray,
-      topProdutos: produtoArray.slice(0, 10),
+      topProdutos: produtoArray.slice(0, 20),
       allData: salesData,
       gerencias: ['all', ...Object.keys(byGerencia).sort()],
       tipos: ['all', ...Object.keys(byTipo).sort()]
@@ -733,7 +720,7 @@ function App() {
 
                   {/* Vendas por Tipo */}
                   <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <h3 className="text-xl font-semibold text-white mb-6">Distribuição por Tipo</h3>
+                    <h3 className="text-xl font-semibold text-white mb-6">Distribuição por Tipo (Quantidade de Itens)</h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
                         <Pie
@@ -744,7 +731,7 @@ function App() {
                           label={({ tipo, percent }) => `${tipo} (${(percent * 100).toFixed(0)}%)`}
                           outerRadius={100}
                           fill="#8884d8"
-                          dataKey="valorTotal"
+                          dataKey="itens"
                         >
                           {salesAnalytics.byTipo.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -752,7 +739,7 @@ function App() {
                         </Pie>
                         <Tooltip
                           contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                          formatter={(value) => `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                          formatter={(value) => `${Number(value).toLocaleString('pt-BR')} itens`}
                         />
                       </PieChart>
                     </ResponsiveContainer>
@@ -764,11 +751,11 @@ function App() {
                   {/* Vendas por Setor */}
                   <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
                     <h3 className="text-xl font-semibold text-white mb-6">Vendas por Setor</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={salesAnalytics.bySetor.slice(0, 10)} layout="vertical">
+                    <ResponsiveContainer width="100%" height={500}>
+                      <BarChart data={salesAnalytics.bySetor.slice(0, 15)} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
                         <XAxis type="number" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-                        <YAxis dataKey="setor" type="category" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} width={80} />
+                        <YAxis dataKey="setor" type="category" stroke="#9ca3af" tick={{ fill: '#9ca3af', fontSize: 12 }} width={150} />
                         <Tooltip
                           contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
                           labelStyle={{ color: '#f1f5f9' }}
@@ -787,8 +774,8 @@ function App() {
 
                   {/* Top Produtos */}
                   <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <h3 className="text-xl font-semibold text-white mb-6">Top 10 Produtos</h3>
-                    <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                    <h3 className="text-xl font-semibold text-white mb-6">Top 20 Produtos</h3>
+                    <div className="space-y-3 max-h-[500px] overflow-y-auto">
                       {salesAnalytics.topProdutos.map((produto, idx) => (
                         <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                           <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -811,7 +798,7 @@ function App() {
 
                 {/* Top Revendedoras */}
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-8">
-                  <h3 className="text-xl font-semibold text-white mb-6">Top 10 Revendedoras</h3>
+                  <h3 className="text-xl font-semibold text-white mb-6">Top 20 Revendedoras</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
