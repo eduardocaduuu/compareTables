@@ -548,107 +548,105 @@ function App() {
           </div>
         )}
 
-        {/* Main Tabs Navigation */}
-        {(analytics || salesData) && (
-          <div className="flex space-x-2 mb-6 bg-white/5 backdrop-blur-xl rounded-xl p-2">
-            {analytics && (
-              <>
-                <button
-                  onClick={() => setActiveTab('dashboard')}
-                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                    activeTab === 'dashboard'
-                      ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={() => setActiveTab('products')}
-                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                    activeTab === 'products'
-                      ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Produtos
-                </button>
-                <button
-                  onClick={() => setActiveTab('buyers')}
-                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                    activeTab === 'buyers'
-                      ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Compradores
-                </button>
-              </>
-            )}
-            <button
-              onClick={() => setActiveTab('sales')}
-              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                activeTab === 'sales'
-                  ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              Análise de Vendas
-            </button>
-          </div>
+        {/* Analytics Dashboard */}
+        {analytics && (
+          <>
+            {/* Tabs */}
+            <div className="flex space-x-2 mb-6 bg-white/5 backdrop-blur-xl rounded-xl p-2">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                  activeTab === 'dashboard'
+                    ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                  activeTab === 'products'
+                    ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Produtos
+              </button>
+              <button
+                onClick={() => setActiveTab('buyers')}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                  activeTab === 'buyers'
+                    ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Compradores
+              </button>
+            </div>
+          </>
         )}
 
-        {/* Sales Tab Content */}
-        {activeTab === 'sales' && (
-          <>
-            {!salesData ? (
-              <div className="mb-8">
-                <div
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files[0];
-                    if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
-                      handleSalesUpload(file);
-                    } else {
-                      setSalesError('Por favor, envie um arquivo Excel (.xlsx ou .xls)');
-                    }
-                  }}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity blur-xl" />
-                  <div className="relative bg-white/5 backdrop-blur-xl border-2 border-dashed border-white/20 rounded-2xl p-8 text-center hover:border-orange-500/50 transition-all">
-                    <TrendingUp className="w-16 h-16 mx-auto mb-4 text-orange-400" />
-                    <h3 className="text-xl font-semibold text-white mb-2">
-                      Planilha de Vendas
-                    </h3>
-                    <p className="text-gray-400 mb-4">
-                      Arraste ou clique para enviar arquivo Excel de vendas
-                    </p>
-                    <input
-                      type="file"
-                      accept=".xlsx,.xls"
-                      onChange={(e) => e.target.files[0] && handleSalesUpload(e.target.files[0])}
-                      className="hidden"
-                      id="sales-upload"
-                      disabled={loadingSales}
-                    />
-                    <label
-                      htmlFor="sales-upload"
-                      className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
-                    >
-                      <Upload className="w-5 h-5 mr-2" />
-                      {loadingSales ? 'Processando...' : 'Selecionar Arquivo'}
-                    </label>
-                    {salesError && (
-                      <p className="mt-4 text-red-400 text-sm">{salesError}</p>
-                    )}
-                  </div>
+        {/* SALES SECTION - INDEPENDENT FROM PRODUCTS/BUYERS */}
+        <div className="mt-12 pt-12 border-t-2 border-white/20">
+          <div className="mb-8">
+            <div className="flex items-center justify-center space-x-3 mb-2">
+              <div className="bg-gradient-to-br from-orange-500 to-pink-500 p-3 rounded-xl">
+                <TrendingUp className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold text-white">Análise de Vendas</h2>
+            </div>
+            <p className="text-center text-gray-400">Módulo independente para análise de dados de vendas</p>
+          </div>
+
+          {!salesData ? (
+            <div className="mb-8">
+              <div
+                onDragOver={handleDragOver}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files[0];
+                  if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
+                    handleSalesUpload(file);
+                  } else {
+                    setSalesError('Por favor, envie um arquivo Excel (.xlsx ou .xls)');
+                  }
+                }}
+                className="relative group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity blur-xl" />
+                <div className="relative bg-white/5 backdrop-blur-xl border-2 border-dashed border-white/20 rounded-2xl p-8 text-center hover:border-orange-500/50 transition-all">
+                  <TrendingUp className="w-16 h-16 mx-auto mb-4 text-orange-400" />
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    Planilha de Vendas
+                  </h3>
+                  <p className="text-gray-400 mb-4">
+                    Arraste ou clique para enviar arquivo Excel de vendas
+                  </p>
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={(e) => e.target.files[0] && handleSalesUpload(e.target.files[0])}
+                    className="hidden"
+                    id="sales-upload"
+                    disabled={loadingSales}
+                  />
+                  <label
+                    htmlFor="sales-upload"
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
+                  >
+                    <Upload className="w-5 h-5 mr-2" />
+                    {loadingSales ? 'Processando...' : 'Selecionar Arquivo'}
+                  </label>
+                  {salesError && (
+                    <p className="mt-4 text-red-400 text-sm">{salesError}</p>
+                  )}
                 </div>
               </div>
-            ) : salesAnalytics && (
-              // Sales Analytics Dashboard
-              <>
+            </div>
+          ) : salesAnalytics && (
+            // Sales Analytics Dashboard
+            <>
                 {/* KPI Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div className="relative group">
@@ -972,12 +970,12 @@ function App() {
                   </button>
                 </div>
               </>
-            )}
-          </>
-        )}
+            )
+          )}
+        </div>
 
         {/* Products/Buyers Analytics */}
-        {analytics && activeTab !== 'sales' && (
+        {analytics && (
           <>
 
             {activeTab === 'dashboard' && (
